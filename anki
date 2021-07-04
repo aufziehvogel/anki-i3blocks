@@ -11,7 +11,8 @@ all_query="SELECT COUNT(*) FROM cards c JOIN decks d ON c.did = d.id WHERE d.nam
 
 # TODO: Is there really no other way to work around the exclusive lock that
 # Anki or AnkiConnect seems to hold than copying the whole database?
-tmp_db=/tmp/anki.sqlite3
+uuid=$(uuidgen)
+tmp_db=/tmp/anki-${uuid}.sqlite3
 cp "$ANKI_COLLECTION_PATH" $tmp_db
 learning_count=$(sqlite3 -readonly $tmp_db "$learning_query")
 all_count=$(sqlite3 -readonly $tmp_db "$all_query")
