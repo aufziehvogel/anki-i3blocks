@@ -8,6 +8,8 @@ fi
 
 learning_query="SELECT COUNT(*) FROM cards c JOIN decks d ON c.did = d.id WHERE d.name = '$deck' COLLATE NOCASE AND c.ivl != 0;"
 all_query="SELECT COUNT(*) FROM cards c JOIN decks d ON c.did = d.id WHERE d.name = '$deck' COLLATE NOCASE;"
+today=$(date +%Y-%m-%d)
+duration_query="SELECT SUM(time) FROM revlog r JOIN cards c ON r.cid = c.id JOIN decks d ON c.did = d.id WHERE d.name = '$deck' COLLATE NOCASE AND r.id >= strftime('%s', '$today') * 1000;"
 
 # TODO: Is there really no other way to work around the exclusive lock that
 # Anki or AnkiConnect seems to hold than copying the whole database?
@@ -16,6 +18,8 @@ tmp_db=/tmp/anki-${uuid}.sqlite3
 cp "$ANKI_COLLECTION_PATH" $tmp_db
 learning_count=$(sqlite3 -readonly $tmp_db "$learning_query")
 all_count=$(sqlite3 -readonly $tmp_db "$all_query")
+duration_ms=$(sqlite3 -readonly $tmp_db "$duration_query")
+duration_min=$((duration_ms / 60000))
 rm $tmp_db
 
-echo $learning_count/$all_count
+echo "$learning_count/$all_count ($duration_min min)"
