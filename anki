@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+deck=$1
+
+if [[ -z $ANKI_COLLECTION_PATH ]]; then
+    ANKI_COLLECTION_PATH="$HOME/.local/share/Anki2/User 1/collection.anki2"
+fi
+
+learning_query="SELECT COUNT(*) FROM cards c JOIN decks d ON c.did = d.id WHERE d.name = '$deck' COLLATE NOCASE AND c.ivl != 0;"
+all_query="SELECT COUNT(*) FROM cards c JOIN decks d ON c.did = d.id WHERE d.name = '$deck' COLLATE NOCASE;"
+
+learning_count=$(sqlite3 "$ANKI_COLLECTION_PATH" "$learning_query")
+all_count=$(sqlite3 "$ANKI_COLLECTION_PATH" "$all_query")
+
+echo $learning_count/$all_count
